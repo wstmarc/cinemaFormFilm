@@ -1,0 +1,490 @@
+<!--
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des genres</title>
+    <div th:replace="fragments/layout :: header-css"></div>
+</head>
+<body>
+<div th:include="fragments/layout :: header-page"></div>
+
+&lt;!&ndash; Modale pour l'ajout, modification, suppression d'un genre &ndash;&gt;
+<div id="modalUI" class="ui modal">
+    <div class="ui container padded">
+        <div class="Header">
+            <h3>Genre</h3>
+        </div>
+        <div class="ui padded form">
+            <input type="hidden" name="id" id="id-genre">
+            <div class="fourteen wide field">
+                <input type="text" name="name" id="name-genre">
+            </div>
+            <div class="actions">
+                <div class="circular ui green icon button" onclick="addGenre()" id="add-button">
+                    <i class="white plus icon"></i>
+                </div>
+                <div class="circular ui green icon button" onclick="updateGenre()" id="mod-button">
+                    <i class="white check icon icon"></i>
+                </div>
+                &lt;!&ndash;<div class="circular ui icon red button" onclick="eraseGenre()" id="del-button">&ndash;&gt;
+                <div class="circular ui icon red button" onclick="openConfirmDialog()" id="del-button">
+                    <i class="white minus icon"></i>
+                </div>
+                <div class="circular ui icon blue button" onclick="exitDialog()" id="exit-button">
+                    <i class="white close icon icon"></i>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+&lt;!&ndash; Modale pour la demande de confirmation de suppression &ndash;&gt;
+<div id="modalConfirmSuppr" class="ui mini modal">
+    <div class="ui red header">ATTENTION</div>
+    <div class="content">
+        <p  class="ui header">Voulez-vous confirmer la suppression ?</p>
+    </div>
+    <div class="actions">
+        &lt;!&ndash;<div class="ui approve labeled icon button" onclick="eraseGenre()">Oh oui<i class="checkmark green icon"></i></div>&ndash;&gt;
+        <div class="ui green approve right labeled icon button" onclick="eraseGenre()">Oh oui<i class="checkmark icon"></i></div>
+        &lt;!&ndash;<div class="ui button">Fuck, pas besoin de ce bouton!</div>&ndash;&gt;
+        <div class="ui red cancel right labeled icon button" onclick="exitDialog()">Non pitié<i class="close icon"></i></div>
+    </div>
+</div>
+
+<div class="ui primary button" onclick="openDialogAdd()">
+    Ajouter un genre
+</div>
+<table class="ui selectable celled table">
+    <thead>
+    <tr>
+        <th>Genre</th>
+    </tr>
+    </thead>
+    <tbody id="genre-body">
+    <tr id="rgenre-template"><td id="genre-template">un genre</td></tr>
+    <tr th:each="genre: ${genres}" th:id="'rgenre'+${genre.id}" th:onclick="'openDialogMod(' + ${genre.id}+')'">
+        <td th:text="${genre.name}" th:id="'genre'+ ${genre.id}">Un genre</td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:include="fragments/layout :: footer-js"></div>
+
+<script type="application/javascript">
+    $('#menu-genres').addClass("active");
+    $('.ui.dropdown').dropdown();
+    $('.ui.modal').modal();
+    // $('#modalConfirmSuppr').modal('show');
+    $('#modalConfirmSuppr').modal('hide');
+    $('#rgenre-template').hide();
+
+    
+
+    function openDialogMod(idGenre) {
+        console.log('FONCTION openDialogMod');
+        $('#id-genre').val(idGenre);
+        $('#name-genre').val($('#genre' + idGenre).text());
+        $('#add-button').hide();
+        $('#mod-button').show();
+        $('#del-button').show();
+        $('.ui.modal').modal('show');
+    }
+
+    function openDialogAdd() {
+        console.log('FONCTION openDialogAdd');
+        $('#id-genre').val(0);
+        $('#name-genre').val("");
+        $('#add-button').show();
+        $('#mod-button').hide();
+        $('#del-button').hide();
+        $('.ui.modal').modal('show');
+    }
+
+    function openConfirmDialog() {
+        console.log("FONHCTION openConfirmDialog")
+        $('.mini.modal')
+            .modal('show')
+        ;
+    }
+
+    function addGenre() {
+        console.log('FONCTION addGenre');
+        $('.ui.modal').modal('hide');
+        var genreVal = {
+            "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        $.ajax({
+            url: '/api/genre',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessAddNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+    
+    function eraseGenre() {
+        console.log('FONCTION eraseGenre');
+        $('.ui.modal').modal('hide');
+        var genreVal = {
+            "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        $.ajax({
+            url: '/api/genre/' + genreVal.id,
+            type: 'delete',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessEraseNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function updateGenre() {
+        console.log('FONCTION updateGenre');
+        $('.ui.modal').modal('hide');
+        var genreVal = {
+            "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        $.ajax({
+            url: '/api/genre',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessUpdateNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function onSuccessAddNameGenre(result){
+        console.log('FONCTION onSuccessAddNameGenre');
+        var row = $('#rgenre-template').clone();
+        row.attr("id", 'rgenre'+result.id);
+        var col = row.find('#genre-template');
+        col.attr("id", 'genre'+result.id);
+        col.text(result.name);
+        row.show();
+        $('#genre-body').append(row);
+        $('#rgenre'+result.id).on('click', function () {
+            openDialogMod(result.id);
+        });
+    }
+
+    function onSuccessUpdateNameGenre(result) {
+        console.log('FONCTION onSuccessUpdateNameGenre');
+        $("#genre" + result.id).text(result.name);
+    }
+
+
+    function onErrorOnGenreApi(jqXHR, textStatus, errorThrown) {
+        console.log('FONCTION onErrorOnGenreApi');
+        console.log('jqXHR:');
+        console.log(jqXHR);
+        console.log("message d'erreur: " + jqXHR.responseJSON.message);
+        console.log('textStatus:');
+        console.log(textStatus);
+        console.log('errorThrown:');
+        console.log(errorThrown);
+        alert("Echec de l'opération\n"+jqXHR.responseJSON.message);
+    }
+
+
+    function onSuccessEraseNameGenre(result) {
+        console.log('FONCTION onSuccessEraseNameGenre');
+        $('#rgenre' + result.id).remove();
+    }
+    
+    function exitDialog() {
+        console.log('FONCTION exitDialog');
+        $('.ui.modal').modal('hide');
+    }
+
+
+</script>
+</body>
+</html>-->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des genres</title>
+    <div th:replace="fragments/layout :: header-css"></div>
+</head>
+<body>
+<div th:include="fragments/layout :: header-page"></div>
+
+<!-- Modale pour l'ajout, modification, suppression d'un genre -->
+<div id="modalUI" class="ui modal">
+    <div class="ui container padded">
+        <div class="Header">
+            <h3>Genre</h3>
+        </div>
+        <div class="ui padded form">
+            <input type="hidden" name="id" id="id-genre">
+            <div class="fourteen wide field">
+                <input type="text" name="name" id="name-genre">
+            </div>
+            <div class="actions">
+                <div class="circular ui green icon button" onclick="addGenre()" id="add-button">
+                    <i class="white plus icon"></i>
+                </div>
+                <div class="circular ui green icon button" onclick="updateGenre()" id="mod-button">
+                    <i class="white check icon icon"></i>
+                </div>
+                <!--<div class="circular ui icon red button" onclick="eraseGenre()" id="del-button">-->
+                <div class="circular ui icon red button" onclick="openConfirmDialog()" id="del-button">
+                    <i class="white minus icon"></i>
+                </div>
+                <div class="circular ui icon blue button" onclick="exitDialog()" id="exit-button">
+                    <i class="white close icon icon"></i>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale pour la demande de confirmation de suppression -->
+<div id="modalConfirmSuppr" class="green ui mini modal">
+    <div class="ui red header">ATTENTION</div>
+    <div class="content">
+        <p  class="ui header">Voulez-vous confirmer la suppression ?</p>
+    </div>
+    <div class="actions">
+        <!--<div class="ui approve labeled icon button" onclick="eraseGenre()">Oh oui<i class="checkmark green icon"></i></div>-->
+        <div class="ui green approve right labeled icon button" onclick="eraseGenre()">Oh oui<i class="checkmark icon"></i></div>
+        <!--<div class="ui button">Fuck, pas besoin de ce bouton!</div>-->
+        <div class="ui red cancel right labeled icon button" onclick="exitDialog()">Non pitié<i class="close icon"></i></div>
+    </div>
+</div>
+
+<!-- TEST Label latéral de type ruban -->
+<!--<div class="html ui top attached segment">
+    <div class="ui one column grid">
+        <div class="column">
+            <div class="ui raised segment">
+                <a class="ui red ribbon label">Overview</a>
+                <span>Account Details</span>
+                <p>Qu'est-ce que le Lorem Ipsum?</p>
+                <p>Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.</p>
+            </div>
+        </div>
+        &lt;!&ndash;<div class="column">&ndash;&gt;
+            &lt;!&ndash;<div class="ui segment">&ndash;&gt;
+                &lt;!&ndash;<a class="ui orange right ribbon label">Specs</a>&ndash;&gt;
+                &lt;!&ndash;<p>Pourquoi l'utiliser?</p>&ndash;&gt;
+                &lt;!&ndash;<p>On sait depuis longtemps que travailler avec du texte lisible et contenant du sens est source de distractions, et empêche de se concentrer sur la mise en page elle-même. L'avantage du Lorem Ipsum sur un texte générique comme 'Du texte. Du texte. Du texte.' est qu'il possède une distribution de lettres plus ou moins normale, et en tout cas comparable avec celle du français standard. De nombreuses suites logicielles de mise en page ou éditeurs de sites Web ont fait du Lorem Ipsum leur faux texte par défaut, et une recherche pour 'Lorem Ipsum' vous conduira vers de nombreux sites qui n'en sont encore qu'à leur phase de construction. Plusieurs versions sont apparues avec le temps, parfois par accident, souvent intentionnellement (histoire d'y rajouter de petits clins d'oeil, voire des phrases embarassantes).</p>&ndash;&gt;
+                &lt;!&ndash;<a class="ui teal right ribbon label">Reviews</a>&ndash;&gt;
+                &lt;!&ndash;<p></p>&ndash;&gt;
+            &lt;!&ndash;</div>&ndash;&gt;
+        &lt;!&ndash;</div>&ndash;&gt;
+    </div>
+</div>-->
+
+<!-- TEST Modale suppression de compte -->
+<!--<div id="modalTest" class="ui small test modal transition visible active" style="display: block !important;">
+    <div class="header">
+        Delete Your Account
+    </div>
+    <div class="content">
+        <p>Are you sure you want to delete your account</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>-->
+
+<!-- BOUTON Ajouter genre -->
+<div class="ui primary button" onclick="openDialogAdd()">
+    Ajouter un genre
+</div>
+
+<!-- TABLE listant tous les genres de films -->
+<table class="ui selectable celled table">
+    <thead>
+    <tr>
+        <th>Genre</th>
+    </tr>
+    </thead>
+    <tbody id="genre-body">
+    <tr id="rgenre-template"><td id="genre-template">un genre</td></tr>
+    <tr th:each="genre: ${genres}" th:id="'rgenre'+${genre.id}" th:onclick="'openDialogMod(' + ${genre.id}+')'">
+        <td th:text="${genre.name}" th:id="'genre'+ ${genre.id}">Un genre</td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:include="fragments/layout :: footer-js"></div><!-- INCLUSION de tous les scripts javascript -->
+
+<script type="application/javascript">
+    $('#menu-genres').addClass("active");
+    $('.ui.dropdown').dropdown();
+    $('.ui.modal').modal();
+    $('#modalConfirmSuppr').modal('hide');
+
+    $('#rgenre-template').hide();
+
+    // $('.ui.modal').modal();              $('#modalUI').modal();
+    // $('.ui.mini.modal').modal();        $('#modalConfirmSuppr').modal();
+    // $('.ui.small.modal').modal();           $('#modalTest').modal();
+
+    function openDialogMod(idGenre) {
+        console.log("openDialogMod");
+        $('#modalConfirmSuppr').modal('hide');
+
+        $('#id-genre').val(idGenre);
+        $('#name-genre').val($('#genre' + idGenre).text());
+        $('#add-button').hide();
+        $('#mod-button').show();
+        $('#del-button').show();
+
+        $('#modalUI').modal('show');
+    }
+
+    function openDialogAdd() {
+        console.log("openDialogAdd");
+        $('#modalConfirmSuppr').modal('hide');
+
+        $('#id-genre').val(0);
+        $('#name-genre').val("");
+        $('#add-button').show();
+        $('#mod-button').hide();
+        $('#del-button').hide();
+
+        $('#modalUI').modal('show');
+    }
+
+    function openConfirmDialog() {
+        console.log("openConfirmDialog")
+        /*$('.mini.modal')
+            .modal('show')
+        ;*/
+        $('#modalConfirmSuppr').modal('show');
+    }
+
+    function addGenre() {
+        console.log("addGenre");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        genreVal = {
+            //  "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        $.ajax({
+            url: '/api/genre',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessAddNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function eraseGenre() {
+        console.log("eraseGenre");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        genreVal = {
+            "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        console.log(genreVal);
+        $.ajax({
+            url: '/api/genre/' + genreVal.id,
+            // url: '/api/genre',
+            type: 'delete',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessEraseNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function updateGenre() {
+        console.log("updateGenre");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        genreVal = {
+            "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        $.ajax({
+            url: '/api/genre',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessUpdateNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function onSuccessAddNameGenre(result){
+        console.log("onSuccesAddNameGenre");
+        var row = $('#rgenre-template').clone();
+        row.attr("id", 'rgenre'+result.id);
+        col = row.find('#genre-template');
+        col.attr("id", 'genre'+result.id);
+        col.text(result.name);
+        row.attr("onclick","openDialogMod(" + result.id +")");
+        $("#genre-body").append(row);
+        row.show();
+        /*
+        <tr id="rgenre-template"><td id="genre-template">un genre</td></tr>
+
+        <tr id="rgenre6" onclick="openDialogMod(6)">
+          <td id="genre6">Fantastique</td>
+      </tr>
+         */
+
+    }
+
+    function onSuccessUpdateNameGenre(result) {
+        console.log("onSuccesUpdateNameGenre");
+        $("#genre" + result.id).text(result.name);
+    }
+
+    function onErrorOnGenreApi(jqXHR, textStatus, errorThrown) {
+        console.log("onErrorOnGenreApi");
+        alert("Echec de l'opération de mise à jour...");
+        console.log('jqXHR:');
+        console.log(jqXHR);
+        console.log("message d'erreur: " + jqXHR.responseJSON.message);
+        console.log('textStatus:');
+        console.log(textStatus);
+        console.log('errorThrown:');
+        console.log(errorThrown);
+    }
+
+    function onSuccessEraseNameGenre(result) {
+        console.log("onSuccesEraseNameGenre");
+        $('#rgenre' + result.id).remove();
+    }
+
+    function exitDialog() {
+        console.log("exitDialog");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        // $('#modalConfirmSuppr').modal('hide');
+    }
+
+</script>
+</body>
+</html>
