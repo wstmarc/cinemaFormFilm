@@ -267,47 +267,13 @@
     </div>
 </div>
 
-<!-- TEST Label latéral de type ruban -->
-<!--<div class="html ui top attached segment">
-    <div class="ui one column grid">
-        <div class="column">
-            <div class="ui raised segment">
-                <a class="ui red ribbon label">Overview</a>
-                <span>Account Details</span>
-                <p>Qu'est-ce que le Lorem Ipsum?</p>
-                <p>Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.</p>
-            </div>
-        </div>
-        &lt;!&ndash;<div class="column">&ndash;&gt;
-            &lt;!&ndash;<div class="ui segment">&ndash;&gt;
-                &lt;!&ndash;<a class="ui orange right ribbon label">Specs</a>&ndash;&gt;
-                &lt;!&ndash;<p>Pourquoi l'utiliser?</p>&ndash;&gt;
-                &lt;!&ndash;<p>On sait depuis longtemps que travailler avec du texte lisible et contenant du sens est source de distractions, et empêche de se concentrer sur la mise en page elle-même. L'avantage du Lorem Ipsum sur un texte générique comme 'Du texte. Du texte. Du texte.' est qu'il possède une distribution de lettres plus ou moins normale, et en tout cas comparable avec celle du français standard. De nombreuses suites logicielles de mise en page ou éditeurs de sites Web ont fait du Lorem Ipsum leur faux texte par défaut, et une recherche pour 'Lorem Ipsum' vous conduira vers de nombreux sites qui n'en sont encore qu'à leur phase de construction. Plusieurs versions sont apparues avec le temps, parfois par accident, souvent intentionnellement (histoire d'y rajouter de petits clins d'oeil, voire des phrases embarassantes).</p>&ndash;&gt;
-                &lt;!&ndash;<a class="ui teal right ribbon label">Reviews</a>&ndash;&gt;
-                &lt;!&ndash;<p></p>&ndash;&gt;
-            &lt;!&ndash;</div>&ndash;&gt;
-        &lt;!&ndash;</div>&ndash;&gt;
+<!-- Modale pour afficher un message d'erreur -->
+<div id="modalErrorMessage" class="ui negative message modal">
+    <i class="close labeled right icon" onclick="exitDialog()"></i>
+    <div id="messageErr" class="header">
+        Ici devrait s'afficher le message d'erreur dynamiquement
     </div>
-</div>-->
-
-<!-- TEST Modale suppression de compte -->
-<!--<div id="modalTest" class="ui small test modal transition visible active" style="display: block !important;">
-    <div class="header">
-        Delete Your Account
-    </div>
-    <div class="content">
-        <p>Are you sure you want to delete your account</p>
-    </div>
-    <div class="actions">
-        <div class="ui negative button">
-            No
-        </div>
-        <div class="ui positive right labeled icon button">
-            Yes
-            <i class="checkmark icon"></i>
-        </div>
-    </div>
-</div>-->
+</div>
 
 <!-- BOUTON Ajouter genre -->
 <div class="ui primary button" onclick="openDialogAdd()">
@@ -333,7 +299,7 @@
 
 <script type="application/javascript">
     $('#menu-genres').addClass("active");
-    $('.ui.dropdown').dropdown();
+/*    $('.ui.dropdown').dropdown();*/
     $('.ui.modal').modal();
     $('#modalConfirmSuppr').modal('hide');
 
@@ -463,7 +429,7 @@
 
     function onErrorOnGenreApi(jqXHR, textStatus, errorThrown) {
         console.log("onErrorOnGenreApi");
-        alert("Echec de l'opération de mise à jour...");
+        // alert("Echec de l'opération de mise à jour...");
         console.log('jqXHR:');
         console.log(jqXHR);
         console.log("message d'erreur: " + jqXHR.responseJSON.message);
@@ -471,6 +437,9 @@
         console.log(textStatus);
         console.log('errorThrown:');
         console.log(errorThrown);
+        $("#messageErr").text("Echec de l'opération\n"+jqXHR.responseJSON.message);
+        $("#modalErrorMessage").modal('show');
+        // alert("Echec de l'opération\n"+jqXHR.responseJSON.message);
     }
 
     function onSuccessEraseNameGenre(result) {

@@ -52,6 +52,8 @@ public class GenreRestController {
     @PostMapping("")
     public Genre add(@RequestBody Genre genre){
         if (genre.getName().isEmpty()) throw new IllegalArgumentException("Name is empty");
+/*        if (genre.getName().length() < 3) throw new IllegalArgumentException("Name is 'too short'");
+        if (genre.getName().length() > 30) throw new IllegalArgumentException("Name is 'TOO LONG'");*/
         return genreManager.save(genre);
     }
 
