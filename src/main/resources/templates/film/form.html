@@ -1,15 +1,66 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${title}">Title</title>
-    <div th:replace="fragments/layout :: header-css">
-
-    </div>
+    <!--<meta charset="UTF-8">-->
+    <!--<title th:text="${title}">Title</title>-->
+    <div th:replace="fragments/layout :: header-css"></div>
 </head>
 <body>
-<div th:include="fragments/layout :: header-page">
+<div th:include="fragments/layout :: header-page"></div>
+
+<!-- TODO : Modale pour l'AJOUT, MODIFICATION, SUPPRESSION d'un film -->
+<div id="modalUI" class="ui modal">
+    <div class="ui container padded">
+        <div class="Header">
+            <h3>Film</h3>
+        </div>
+        <div class="ui padded form">
+            <input type="hidden" name="id" id="id-genre">
+            <div class="fourteen wide field">
+                <input type="text" name="name" id="name-genre">
+            </div>
+            <div class="actions">
+                <div class="circular ui green icon button" onclick="addGenre()" id="add-button">
+                    <i class="white plus icon"></i>
+                </div>
+                <div class="circular ui green icon button" onclick="updateGenre()" id="mod-button">
+                    <i class="white check icon icon"></i>
+                </div>
+                <!--<div class="circular ui icon red button" onclick="eraseGenre()" id="del-button">-->
+                <div class="circular ui icon red button" onclick="openConfirmDialog()" id="del-button">
+                    <i class="white minus icon"></i>
+                </div>
+                <div class="circular ui icon blue button" onclick="exitDialog()" id="exit-button">
+                    <i class="white close icon icon"></i>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- TODO : Modale pour la DEMANDE DE CONFIRMATION DE SUPPRESSION d'un film -->
+<div id="modalConfirmSuppr" class="green ui mini modal">
+    <div class="ui red header">ATTENTION</div>
+    <div class="content">
+        <p  class="ui header">Voulez-vous confirmer la suppression ?</p>
+    </div>
+    <div class="actions">
+        <!--<div class="ui approve labeled icon button" onclick="eraseGenre()">Oh oui<i class="checkmark green icon"></i></div>-->
+        <div class="ui green approve right labeled icon button" onclick="eraseGenre()">Oh oui<i class="checkmark icon"></i></div>
+        <!--<div class="ui button">Fuck, pas besoin de ce bouton!</div>-->
+        <div class="ui red cancel right labeled icon button" onclick="exitDialog()">Non pitié<i class="close icon"></i></div>
+    </div>
+</div>
+
+<!-- TODO : Modale pour AFFICHER UN MESSAGE D'ERREUR -->
+<div id="modalErrorMessage" class="ui negative message modal">
+    <i class="close labeled right icon" onclick="exitDialog()"></i>
+    <div id="messageErr" class="header">
+        Ici devrait s'afficher le message d'erreur dynamiquement
+    </div>
+</div>
+
 
 <h2 class="ui dividing">Fiche signalétique</h2>
 <form
@@ -162,7 +213,6 @@
         </div>
     </div>
 </form>
-
 
 <div th:include="fragments/layout :: footer-js"></div>
 

@@ -36,10 +36,35 @@
     </div>
 </div>
 
+<!-- BOUTONS TEST -->
+<button class="primary ui button">Ajouter un film</button><br/>
+
+<button class="circular ui green icon button">
+    <i class="white plus icon icon"></i>
+</button><br/>
+
+<div class="ui primary button" onclick="openDialogAdd()">
+    Ajouter un nouveau film BB
+</div>
 
 <div th:include="fragments/layout :: footer-js"></div>
 <script type="application/javascript">
     $('#menu-films').addClass("active");
+    $('.ui.modal').modal();
+    $('#modalConfirmSuppr').modal('hide');
+
+    function openDialogAdd() {
+        console.log("openDialogAdd");
+        $('#modalConfirmSuppr').modal('hide');
+
+        $('#id-genre').val(0);
+        $('#name-genre').val("");
+        $('#add-button').show();
+        $('#mod-button').hide();
+        $('#del-button').hide();
+
+        $('#modalUI').modal('show');
+    }
 </script>
 
 </body>

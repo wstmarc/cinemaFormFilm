@@ -33,7 +33,7 @@ public class Genre {
     @Unique
     @NotBlank
     @NotNull
-    @Size.List({
+    @Size.List({/* Contraintes */
         @Size(min = 3, message = "\"Name is 'too short'\""),
         @Size(max = 30, message = "\"Name is 'TOO LONG'\"")
     })

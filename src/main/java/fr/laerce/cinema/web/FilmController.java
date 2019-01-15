@@ -30,7 +30,6 @@ public class FilmController {
     GenreManager genreManager;
 
 
-
     @Autowired
     ImageManager imm;
 
