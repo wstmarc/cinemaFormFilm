@@ -219,11 +219,150 @@
 <script type="application/javascript">
     $('#menu-films').addClass("active");
     $('.ui.dropdown').dropdown();
+
+    $('.ui.modal').modal();
+    // $('#modalConfirmSuppr').modal('hide');
+
+    // $('#rgenre-template').hide();
+
     $(document).ready(function () {
         tinymce.init({
             selector: '#summary'
         });
     })
+
+    /* TODO : Adapter TOUTES les fonctions javascript, tirées du formulaire genre, au formulaire du film. */
+    function openDialogMod(idGenre) {
+        console.log("openDialogMod");
+        $('#modalConfirmSuppr').modal('hide');
+
+        $('#id-genre').val(idGenre);
+        $('#name-genre').val($('#genre' + idGenre).text());
+        $('#add-button').hide();
+        $('#mod-button').show();
+        $('#del-button').show();
+
+        $('#modalUI').modal('show');
+    }
+
+    function openConfirmDialog() {
+        console.log("openConfirmDialog")
+        /*$('.mini.modal')
+            .modal('show')
+        ;*/
+        $('#modalConfirmSuppr').modal('show');
+    }
+
+    function addGenre() {
+        console.log("addGenre");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        genreVal = {
+            //  "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        $.ajax({
+            url: '/api/genre',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessAddNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function eraseGenre() {
+        console.log("eraseGenre");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        genreVal = {
+            "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        console.log(genreVal);
+        $.ajax({
+            url: '/api/genre/' + genreVal.id,
+            // url: '/api/genre',
+            type: 'delete',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessEraseNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function updateGenre() {
+        console.log("updateGenre");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        genreVal = {
+            "id": $('#id-genre').val(),
+            "name": $('#name-genre').val()
+        };
+        $.ajax({
+            url: '/api/genre',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: onSuccessUpdateNameGenre,
+            error: onErrorOnGenreApi,
+            data: JSON.stringify(genreVal)
+        });
+    }
+
+    function onSuccessAddNameGenre(result){
+        console.log("onSuccesAddNameGenre");
+        var row = $('#rgenre-template').clone();
+        row.attr("id", 'rgenre'+result.id);
+        col = row.find('#genre-template');
+        col.attr("id", 'genre'+result.id);
+        col.text(result.name);
+        row.attr("onclick","openDialogMod(" + result.id +")");
+        $("#genre-body").append(row);
+        row.show();
+        /*
+        <tr id="rgenre-template"><td id="genre-template">un genre</td></tr>
+
+        <tr id="rgenre6" onclick="openDialogMod(6)">
+          <td id="genre6">Fantastique</td>
+      </tr>
+         */
+
+    }
+
+    function onSuccessUpdateNameGenre(result) {
+        console.log("onSuccesUpdateNameGenre");
+        $("#genre" + result.id).text(result.name);
+    }
+
+    function onErrorOnGenreApi(jqXHR, textStatus, errorThrown) {
+        console.log("onErrorOnGenreApi");
+        // alert("Echec de l'opération de mise à jour...");
+        console.log('jqXHR:');
+        console.log(jqXHR);
+        console.log("message d'erreur: " + jqXHR.responseJSON.message);
+        console.log('textStatus:');
+        console.log(textStatus);
+        console.log('errorThrown:');
+        console.log(errorThrown);
+        $("#messageErr").text("Echec de l'opération\n"+jqXHR.responseJSON.message);
+        $("#modalErrorMessage").modal('show');
+        // alert("Echec de l'opération\n"+jqXHR.responseJSON.message);
+    }
+
+    function onSuccessEraseNameGenre(result) {
+        console.log("onSuccesEraseNameGenre");
+        $('#rgenre' + result.id).remove();
+    }
+
+    function exitDialog() {
+        console.log("exitDialog");
+        // $('.ui.modal').modal('hide');
+        $('#modalUI').modal('hide');
+        // $('#modalConfirmSuppr').modal('hide');
+    }
 
 </script>
 </body>

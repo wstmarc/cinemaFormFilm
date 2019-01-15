@@ -36,8 +36,23 @@
     </div>
 </div>
 
+<!-- TODO : Adapter la TABLE listant tous les genres de films, aux films -->
+<!--<table class="ui selectable celled table">
+    <thead>
+    <tr>
+        <th>Genre</th>
+    </tr>
+    </thead>
+    <tbody id="genre-body">
+    <tr id="rgenre-template"><td id="genre-template">un genre</td></tr>
+    <tr th:each="genre: ${genres}" th:id="'rgenre'+${genre.id}" th:onclick="'openDialogMod(' + ${genre.id}+')'">
+        <td th:text="${genre.name}" th:id="'genre'+ ${genre.id}">Un genre</td>
+    </tr>
+    </tbody>
+</table>-->
+
 <!-- BOUTONS TEST -->
-<button class="primary ui button">Ajouter un film</button><br/>
+<button class="primary ui button" onclick="openwindowsBB">Ajouter un film</button><br/>
 
 <button class="circular ui green icon button">
     <i class="white plus icon icon"></i>
@@ -51,7 +66,10 @@
 <script type="application/javascript">
     $('#menu-films').addClass("active");
     $('.ui.modal').modal();
-    $('#modalConfirmSuppr').modal('hide');
+    // $('#modalConfirmSuppr').modal('hide');
+
+    // $('#rgenre-template').hide();
+
 
     function openDialogAdd() {
         console.log("openDialogAdd");
